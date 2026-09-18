@@ -1,7 +1,9 @@
 package com.adonogtx.poppocard.exception;
 
-public class PoppoCardTransactionException extends RuntimeException {
+public abstract class PoppoCardTransactionException extends Exception {
+
     public PoppoCardTransactionException(String message) {
         super(message);
     }
+
 }

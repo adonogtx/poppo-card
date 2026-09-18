@@ -1,30 +1,65 @@
 package com.adonogtx.poppocard.model;
 
+import com.adonogtx.poppocard.exception.InsufficientBalanceException;
+import com.adonogtx.poppocard.exception.InvalidValueException;
+import com.adonogtx.poppocard.exception.OperationNotAllowedException;
+import com.adonogtx.poppocard.exception.PoppoCardTransactionException;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PoppoCard {
 
     BigDecimal balance;
-    List<Transaction> transactionsHistory;
+    List<Transaction> transactionsHistory = new ArrayList<>();
 
-    public PoppoCard(List<Transaction> transactions) {
-        this.transactionsHistory = transactions;
+    public PoppoCard() {
         this.balance = BigDecimal.valueOf(0.00);
     }
 
-    public boolean rechargeCard(Transaction transaction) {
+    public void rechargeCard(Transaction transaction) throws PoppoCardTransactionException {
 
         if (transaction.amount.compareTo(BigDecimal.ZERO) <= 0) {
-            return false;
+            throw new InvalidValueException(" ");
         }
 
-        if(transaction.location.getType().toString().equals(Chargeability.CHARGEABLE.toString())
-        || transaction.location.getType().toString().equals(Chargeability.CHARGEABLE_AND_RECHARGEABLE.toString())){
-            transactionsHistory.add(transaction);
+        if (transaction.location.getType().getChargeability() == Chargeability.RECHARGEABLE
+                || transaction.location.getType().getChargeability() == Chargeability.CHARGEABLE_AND_RECHARGEABLE) {
+            this.balance = this.balance.add(transaction.getAmount());
+            this.transactionsHistory.add(transaction);
+        } else {
+            throw new OperationNotAllowedException(" ");
         }
 
 
-        return false;
+    }
+
+    public void chargeCard(Transaction transaction) throws PoppoCardTransactionException {
+
+        if (transaction.amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidValueException(" ");
+        }
+
+        if (transaction.getAmount().compareTo(this.balance) > 0) {
+            throw new InsufficientBalanceException(" ");
+        }
+
+        if (transaction.location.getType().getChargeability() == Chargeability.CHARGEABLE
+                || transaction.location.getType().getChargeability() == Chargeability.CHARGEABLE_AND_RECHARGEABLE) {
+            this.balance = this.balance.subtract(transaction.getAmount());
+            this.transactionsHistory.add(transaction);
+        } else {
+            throw new OperationNotAllowedException(" ");
+        }
+
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public List<Transaction> getTransactionsHistory() {
+        return transactionsHistory;
     }
 }

@@ -14,4 +14,8 @@ public enum LocationType {
     LocationType(Chargeability chargeability) {
         this.chargeability = chargeability;
     }
+
+    public Chargeability getChargeability() {
+        return chargeability;
+    }
 }
