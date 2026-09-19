@@ -1,21 +1,28 @@
 package com.adonogtx.poppocard.model;
 
 public enum LocationType {
-    KONBINI(Chargeability.CHARGEABLE_AND_RECHARGEABLE),
-    SUBWAY(Chargeability.CHARGEABLE_AND_RECHARGEABLE),
-    VENDING_MACHINE(Chargeability.RECHARGEABLE),
-    DRUGSTORE(Chargeability.CHARGEABLE),
-    BAR(Chargeability.CHARGEABLE),
-    RESTAURANT(Chargeability.CHARGEABLE),
-    CAFE(Chargeability.CHARGEABLE);
+    KONBINI(true,true),
+    SUBWAY(true,true),
+    VENDING_MACHINE(false, true),
+    DRUGSTORE(true, false),
+    BAR(true, false),
+    RESTAURANT(true, false),
+    CAFE(true, false);
 
-    private final Chargeability chargeability;
 
-    LocationType(Chargeability chargeability) {
-        this.chargeability = chargeability;
+    final boolean acceptsCharge;
+    final boolean acceptsRecharge;
+
+    LocationType(boolean acceptsCharge, boolean acceptsRecharge) {
+        this.acceptsCharge = acceptsCharge;
+        this.acceptsRecharge = acceptsRecharge;
     }
 
-    public Chargeability getChargeability() {
-        return chargeability;
+    public boolean isAcceptsCharge() {
+        return acceptsCharge;
+    }
+
+    public boolean isAcceptsRecharge() {
+        return acceptsRecharge;
     }
 }
