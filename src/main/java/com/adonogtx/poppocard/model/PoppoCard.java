@@ -24,8 +24,7 @@ public class PoppoCard {
             throw new InvalidValueException(" ");
         }
 
-        if (transaction.location.getType().getChargeability() == Chargeability.RECHARGEABLE
-                || transaction.location.getType().getChargeability() == Chargeability.CHARGEABLE_AND_RECHARGEABLE) {
+        if (transaction.getLocation().getType().isAcceptsRecharge()) {
             this.balance = this.balance.add(transaction.getAmount());
             this.transactionsHistory.add(transaction);
         } else {
@@ -45,8 +44,7 @@ public class PoppoCard {
             throw new InsufficientBalanceException(" ");
         }
 
-        if (transaction.location.getType().getChargeability() == Chargeability.CHARGEABLE
-                || transaction.location.getType().getChargeability() == Chargeability.CHARGEABLE_AND_RECHARGEABLE) {
+        if (transaction.getLocation().getType().isAcceptsCharge()) {
             this.balance = this.balance.subtract(transaction.getAmount());
             this.transactionsHistory.add(transaction);
         } else {
