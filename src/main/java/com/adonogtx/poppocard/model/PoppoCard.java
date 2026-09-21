@@ -21,14 +21,15 @@ public class PoppoCard {
     public void rechargeCard(Transaction transaction) throws PoppoCardTransactionException {
 
         if (transaction.amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidValueException(" ");
+            throw new InvalidValueException(String.format("The value must be greater than zero: %s", transaction.getAmount()));
         }
 
         if (transaction.getLocation().getType().isAcceptsRecharge()) {
             this.balance = this.balance.add(transaction.getAmount());
             this.transactionsHistory.add(transaction);
         } else {
-            throw new OperationNotAllowedException(" ");
+            throw new OperationNotAllowedException(String.format("%s not possible on %s",
+                    transaction.getType(),transaction.getLocation().getName()));
         }
 
 
@@ -37,18 +38,19 @@ public class PoppoCard {
     public void chargeCard(Transaction transaction) throws PoppoCardTransactionException {
 
         if (transaction.amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidValueException(" ");
+            throw new InvalidValueException(String.format("The value must be greater than zero: %s", transaction.getAmount()));
         }
 
         if (transaction.getAmount().compareTo(this.balance) > 0) {
-            throw new InsufficientBalanceException(" ");
+            throw new InsufficientBalanceException(String.format("Available balance is %s, but the charge requires %s", this.balance, transaction.getAmount()));
         }
 
         if (transaction.getLocation().getType().isAcceptsCharge()) {
             this.balance = this.balance.subtract(transaction.getAmount());
             this.transactionsHistory.add(transaction);
         } else {
-            throw new OperationNotAllowedException(" ");
+            throw new OperationNotAllowedException(String.format("%s not possible on %s",
+                    transaction.getType(),transaction.getLocation().getName()));
         }
 
     }
