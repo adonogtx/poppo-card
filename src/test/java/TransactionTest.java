@@ -1,3 +1,6 @@
+import com.adonogtx.poppocard.exception.InsufficientBalanceException;
+import com.adonogtx.poppocard.exception.InvalidValueException;
+import com.adonogtx.poppocard.exception.OperationNotAllowedException;
 import com.adonogtx.poppocard.exception.PoppoCardTransactionException;
 import com.adonogtx.poppocard.model.*;
 import org.junit.jupiter.api.Assertions;
@@ -8,7 +11,7 @@ import java.time.LocalDateTime;
 
 public class TransactionTest {
     @Test
-    void testRechargeTransactionSuccess(){
+    void testRechargeTransactionSuccess() {
 
         PoppoCard card = new PoppoCard();
         Location location = new Location("Poppo", LocationType.KONBINI);
@@ -20,12 +23,12 @@ public class TransactionTest {
         }
         System.out.println(card.getBalance());
 
-        Assertions.assertEquals(transaction,card.getTransactionsHistory().getLast());
+        Assertions.assertEquals(transaction, card.getTransactionsHistory().getLast());
 
     }
 
     @Test
-    void testChargeTransactionSuccess(){
+    void testChargeTransactionSuccess() {
 
         PoppoCard card = new PoppoCard();
         Location konbini = new Location("Poppo", LocationType.KONBINI);
@@ -45,8 +48,72 @@ public class TransactionTest {
             throw new RuntimeException(e);
         }
 
-        Assertions.assertEquals(charge,card.getTransactionsHistory().getLast());
+        Assertions.assertEquals(charge, card.getTransactionsHistory().getLast());
 
     }
 
+    @Test
+    void testChargeRejectedByInsufficientBalance() {
+        PoppoCard card = new PoppoCard();
+        Location bar = new Location("Serena", LocationType.BAR);
+        Transaction charge = new Transaction(BigDecimal.valueOf(5.0), TransactionType.CHARGE, bar, LocalDateTime.now());
+
+        Assertions.assertThrows(InsufficientBalanceException.class, () -> {
+            card.chargeCard(charge);
+        });
+
+    }
+
+    @Test
+    void testRechargeOperationNotAllowed() {
+        PoppoCard card = new PoppoCard();
+        Location bar = new Location("Serena", LocationType.BAR);
+        Transaction recharge = new Transaction(BigDecimal.valueOf(10.0), TransactionType.RECHARGE, bar, LocalDateTime.now());
+
+        Assertions.assertThrows(OperationNotAllowedException.class, () -> {
+            card.rechargeCard(recharge);
+        });
+
+    }
+
+    @Test
+    void testChargeOperationNotAllowed() {
+        PoppoCard card = new PoppoCard();
+        Location atm = new Location("ATM", LocationType.VENDING_MACHINE);
+        Transaction charge = new Transaction(BigDecimal.valueOf(5.0), TransactionType.CHARGE, atm, LocalDateTime.now());
+        Transaction recharge = new Transaction(BigDecimal.valueOf(10.0), TransactionType.RECHARGE, atm, LocalDateTime.now());
+
+        try {
+            card.rechargeCard(recharge);
+        } catch (PoppoCardTransactionException e) {
+            throw new RuntimeException(e);
+        }
+
+        Assertions.assertThrows(OperationNotAllowedException.class, () -> {
+            card.chargeCard(charge);
+        });
+
+    }
+
+    @Test
+    void testChargeInvalidValue() {
+        PoppoCard card = new PoppoCard();
+        Location atm = new Location("ATM", LocationType.VENDING_MACHINE);
+        Transaction charge = new Transaction(BigDecimal.valueOf(0.0), TransactionType.CHARGE, atm, LocalDateTime.now());
+
+        Assertions.assertThrows(InvalidValueException.class, () -> {
+            card.chargeCard(charge);
+        });
+    }
+
+    @Test
+    void testRechargeInvalidValue() {
+        PoppoCard card = new PoppoCard();
+        Location atm = new Location("ATM", LocationType.VENDING_MACHINE);
+        Transaction recharge = new Transaction(BigDecimal.valueOf(-10.0), TransactionType.RECHARGE, atm, LocalDateTime.now());
+
+        Assertions.assertThrows(InvalidValueException.class, () -> {
+            card.rechargeCard(recharge);
+        });
+    }
 }
