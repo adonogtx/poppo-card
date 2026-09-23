@@ -184,4 +184,39 @@ public class TransactionTest {
         Assertions.assertFalse(transactionsAtKonbini.contains(subwayCharge));
 
     }
+
+    @Test
+    void testTransactionHistoryOrder(){
+        PoppoCard card = new PoppoCard();
+        Location konbini = new Location("Poppo Store", LocationType.KONBINI);
+        Transaction konbiniRecharge = new Transaction(BigDecimal.valueOf(100.0), TransactionType.RECHARGE, konbini, LocalDateTime.now());
+        Transaction konbiniCharge = new Transaction(BigDecimal.valueOf(20.0), TransactionType.CHARGE, konbini, LocalDateTime.now());
+        Transaction konbiniCharge2 = new Transaction(BigDecimal.valueOf(50.0), TransactionType.CHARGE, konbini, LocalDateTime.now());
+
+        try {
+            card.rechargeCard(konbiniRecharge);
+        } catch (PoppoCardTransactionException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            card.chargeCard(konbiniCharge);
+        } catch (PoppoCardTransactionException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            card.chargeCard(konbiniCharge2);
+        } catch (PoppoCardTransactionException e) {
+            throw new RuntimeException(e);
+        }
+
+        List<Transaction> cardTransactionsHistory = card.getTransactionsHistory();
+
+
+        Assertions.assertEquals(cardTransactionsHistory.get(0), konbiniRecharge);
+        Assertions.assertEquals(cardTransactionsHistory.get(1), konbiniCharge);
+        Assertions.assertEquals(cardTransactionsHistory.get(2), konbiniCharge2);
+
+    }
 }
