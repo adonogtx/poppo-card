@@ -7,6 +7,7 @@ import com.adonogtx.poppocard.exception.PoppoCardTransactionException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PoppoCard {
@@ -60,6 +61,6 @@ public class PoppoCard {
     }
 
     public List<Transaction> getTransactionsHistory() {
-        return transactionsHistory;
+        return  Collections.unmodifiableList(transactionsHistory);
     }
 }
