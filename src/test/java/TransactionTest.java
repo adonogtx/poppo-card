@@ -116,4 +116,21 @@ public class TransactionTest {
             card.rechargeCard(recharge);
         });
     }
+
+    @Test
+    void testUnsupportedOperation() {
+        PoppoCard card = new PoppoCard();
+        Location atm = new Location("ATM", LocationType.VENDING_MACHINE);
+        Transaction recharge = new Transaction(BigDecimal.valueOf(10.0), TransactionType.RECHARGE, atm, LocalDateTime.now());
+
+        try {
+            card.rechargeCard(recharge);
+        } catch (PoppoCardTransactionException e) {
+            throw new RuntimeException(e);
+        }
+
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> {
+            card.getTransactionsHistory().add(recharge);
+        });
+    }
 }
