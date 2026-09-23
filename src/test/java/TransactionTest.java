@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class TransactionTest {
     @Test
@@ -132,5 +133,55 @@ public class TransactionTest {
         Assertions.assertThrows(UnsupportedOperationException.class, () -> {
             card.getTransactionsHistory().add(recharge);
         });
+    }
+
+    @Test
+    void testTransactionsAtLocation(){
+        PoppoCard card = new PoppoCard();
+        Location konbini = new Location("Poppo", LocationType.KONBINI);
+        Location subway = new Location("JR", LocationType.SUBWAY);
+        Transaction konbiniRecharge = new Transaction(BigDecimal.valueOf(100.0), TransactionType.RECHARGE, konbini, LocalDateTime.now());
+        Transaction konbiniCharge = new Transaction(BigDecimal.valueOf(20.0), TransactionType.CHARGE, konbini, LocalDateTime.now());
+        Transaction konbiniCharge2 = new Transaction(BigDecimal.valueOf(50.0), TransactionType.CHARGE, konbini, LocalDateTime.now());
+        Transaction subwayRecharge = new Transaction(BigDecimal.valueOf(100.0), TransactionType.RECHARGE, subway, LocalDateTime.now());
+        Transaction subwayCharge = new Transaction(BigDecimal.valueOf(10.0), TransactionType.CHARGE, subway, LocalDateTime.now());
+
+        try {
+            card.rechargeCard(subwayRecharge);
+        } catch (PoppoCardTransactionException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            card.chargeCard(subwayCharge);
+        } catch (PoppoCardTransactionException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            card.rechargeCard(konbiniRecharge);
+        } catch (PoppoCardTransactionException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            card.chargeCard(konbiniCharge);
+        } catch (PoppoCardTransactionException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            card.chargeCard(konbiniCharge2);
+        } catch (PoppoCardTransactionException e) {
+            throw new RuntimeException(e);
+        }
+
+        List<Transaction> transactionsAtKonbini = card.getTransactionsAtLocation(konbini);
+
+        Assertions.assertTrue(transactionsAtKonbini.contains(konbiniRecharge));
+        Assertions.assertTrue(transactionsAtKonbini.contains(konbiniCharge));
+        Assertions.assertTrue(transactionsAtKonbini.contains(konbiniCharge2));
+        Assertions.assertFalse(transactionsAtKonbini.contains(subwayCharge));
+
     }
 }

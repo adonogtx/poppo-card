@@ -63,4 +63,8 @@ public class PoppoCard {
     public List<Transaction> getTransactionsHistory() {
         return  Collections.unmodifiableList(transactionsHistory);
     }
+
+    public List<Transaction> getTransactionsAtLocation(Location location){
+        return this.transactionsHistory.stream().filter(h->h.getLocation().equals(location)).toList();
+    }
 }
