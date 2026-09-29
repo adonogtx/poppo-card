@@ -24,16 +24,17 @@ public class PoppoCard {
         if (transaction.amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidValueException(String.format("The value must be greater than zero: %s", transaction.getAmount()));
         }
-
+        if (transaction.getType() != TransactionType.RECHARGE) {
+            throw new OperationNotAllowedException(String.format(
+                    "Expected a RECHARGE transaction, got %s", transaction.getType()));
+        }
         if (transaction.getLocation().getType().isAcceptsRecharge()) {
             this.balance = this.balance.add(transaction.getAmount());
             this.transactionsHistory.add(transaction);
         } else {
             throw new OperationNotAllowedException(String.format("%s not possible on %s",
-                    transaction.getType(),transaction.getLocation().getName()));
+                    transaction.getType(), transaction.getLocation().getName()));
         }
-
-
     }
 
     public void chargeCard(Transaction transaction) throws PoppoCardTransactionException {
@@ -51,7 +52,7 @@ public class PoppoCard {
             this.transactionsHistory.add(transaction);
         } else {
             throw new OperationNotAllowedException(String.format("%s not possible on %s",
-                    transaction.getType(),transaction.getLocation().getName()));
+                    transaction.getType(), transaction.getLocation().getName()));
         }
 
     }
@@ -61,10 +62,10 @@ public class PoppoCard {
     }
 
     public List<Transaction> getTransactionsHistory() {
-        return  Collections.unmodifiableList(transactionsHistory);
+        return Collections.unmodifiableList(transactionsHistory);
     }
 
-    public List<Transaction> getTransactionsAtLocation(Location location){
-        return this.transactionsHistory.stream().filter(h->h.getLocation().equals(location)).toList();
+    public List<Transaction> getTransactionsAtLocation(Location location) {
+        return this.transactionsHistory.stream().filter(h -> h.getLocation().equals(location)).toList();
     }
 }
