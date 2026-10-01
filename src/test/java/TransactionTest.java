@@ -99,8 +99,8 @@ public class TransactionTest {
     @Test
     void testChargeInvalidValue() {
         PoppoCard card = new PoppoCard();
-        Location atm = new Location("ATM", LocationType.VENDING_MACHINE);
-        Transaction charge = new Transaction(BigDecimal.valueOf(0.0), TransactionType.CHARGE, atm, LocalDateTime.now());
+        Location bar = new Location("Serena", LocationType.BAR);
+        Transaction charge = new Transaction(new BigDecimal("0.00"), TransactionType.CHARGE, bar, LocalDateTime.now());
 
         Assertions.assertThrows(InvalidValueException.class, () -> {
             card.chargeCard(charge);
@@ -110,8 +110,8 @@ public class TransactionTest {
     @Test
     void testRechargeInvalidValue() {
         PoppoCard card = new PoppoCard();
-        Location atm = new Location("ATM", LocationType.VENDING_MACHINE);
-        Transaction recharge = new Transaction(BigDecimal.valueOf(-10.0), TransactionType.RECHARGE, atm, LocalDateTime.now());
+        Location konbini = new Location("Poppo", LocationType.KONBINI);
+        Transaction recharge = new Transaction(new BigDecimal("-10.00") ,TransactionType.RECHARGE, konbini, LocalDateTime.now());
 
         Assertions.assertThrows(InvalidValueException.class, () -> {
             card.rechargeCard(recharge);
