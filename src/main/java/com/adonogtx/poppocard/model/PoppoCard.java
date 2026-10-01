@@ -6,6 +6,7 @@ import com.adonogtx.poppocard.exception.OperationNotAllowedException;
 import com.adonogtx.poppocard.exception.PoppoCardTransactionException;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,50 +20,64 @@ public class PoppoCard {
         this.balance = new BigDecimal("0.00");
     }
 
-    public void rechargeCard(Transaction transaction) throws PoppoCardTransactionException {
+    public Transaction rechargeCard(BigDecimal amount, Location location)
+            throws PoppoCardTransactionException {
 
-        if (transaction.getType() != TransactionType.RECHARGE) {
+        if (!location.getType().isAcceptsRecharge()) {
             throw new OperationNotAllowedException(String.format(
-                    "Expected a RECHARGE transaction, got %s", transaction.getType()));
-        }
-        if (!transaction.getLocation().getType().isAcceptsRecharge()) {
-            throw new OperationNotAllowedException(String.format("%s not possible on %s",
-                    transaction.getType(), transaction.getLocation().getName()));
+                    "RECHARGE not possible on %s", location.getName()));
         }
 
-        if (transaction.amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidValueException(String.format("The value must be greater than zero: %s", transaction.getAmount()));
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidValueException(String.format(
+                    "The value must be greater than zero: %s", amount));
         }
+
+        Transaction transaction = new Transaction(
+                amount,
+                TransactionType.RECHARGE,
+                location,
+                LocalDateTime.now()
+        );
 
         this.balance = this.balance.add(transaction.getAmount());
         this.transactionsHistory.add(transaction);
 
+        return transaction;
     }
 
-    public void chargeCard(Transaction transaction) throws PoppoCardTransactionException {
+    public Transaction chargeCard(BigDecimal amount, Location location)
+            throws PoppoCardTransactionException {
 
-        if (transaction.getType() != TransactionType.CHARGE) {
+        if (!location.getType().isAcceptsCharge()) {
             throw new OperationNotAllowedException(String.format(
-                    "Expected a CHARGE transaction, got %s", transaction.getType()));
+                    "CHARGE not possible on %s",
+                    location.getName()));
         }
 
-        if (!transaction.getLocation().getType().isAcceptsCharge()) {
-            throw new OperationNotAllowedException(String.format("%s not possible on %s",
-                    transaction.getType(), transaction.getLocation().getName()));
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidValueException(String.format(
+                    "The value must be greater than zero: %s",
+                    amount));
         }
 
-        if (transaction.amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidValueException(String.format("The value must be greater than zero: %s", transaction.getAmount()));
+        if (amount.compareTo(this.balance) > 0) {
+            throw new InsufficientBalanceException(String.format(
+                    "Available balance is %s, but the charge requires %s",
+                    this.balance, amount));
         }
 
-        if (transaction.getAmount().compareTo(this.balance) > 0) {
-            throw new InsufficientBalanceException(
-                    String.format("Available balance is %s, but the charge requires %s",
-                            this.balance, transaction.getAmount()));
-        }
+        Transaction transaction = new Transaction(
+                amount,
+                TransactionType.CHARGE,
+                location,
+                LocalDateTime.now()
+        );
 
         this.balance = this.balance.subtract(transaction.getAmount());
         this.transactionsHistory.add(transaction);
+
+        return transaction;
     }
 
     public BigDecimal getBalance() {
