@@ -16,7 +16,7 @@ public class PoppoCard {
     List<Transaction> transactionsHistory = new ArrayList<>();
 
     public PoppoCard() {
-        this.balance = BigDecimal.valueOf(0.00);
+        this.balance = new BigDecimal("0.00");
     }
 
     public void rechargeCard(Transaction transaction) throws PoppoCardTransactionException {

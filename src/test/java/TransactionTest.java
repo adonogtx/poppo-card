@@ -16,14 +16,14 @@ public class TransactionTest {
 
         PoppoCard card = new PoppoCard();
         Location location = new Location("Poppo", LocationType.KONBINI);
-        Transaction transaction = new Transaction(BigDecimal.valueOf(10.0), TransactionType.RECHARGE, location, LocalDateTime.now());
+        Transaction transaction = new Transaction(new BigDecimal("10.00"), TransactionType.RECHARGE, location, LocalDateTime.now());
         try {
             card.rechargeCard(transaction);
         } catch (PoppoCardTransactionException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(card.getBalance());
 
+        Assertions.assertEquals(new BigDecimal("10.00"), card.getBalance());
         Assertions.assertEquals(transaction, card.getTransactionsHistory().getLast());
 
     }
@@ -34,8 +34,8 @@ public class TransactionTest {
         PoppoCard card = new PoppoCard();
         Location konbini = new Location("Poppo", LocationType.KONBINI);
         Location bar = new Location("Serena", LocationType.BAR);
-        Transaction recharge = new Transaction(BigDecimal.valueOf(10.0), TransactionType.RECHARGE, konbini, LocalDateTime.now());
-        Transaction charge = new Transaction(BigDecimal.valueOf(5.0), TransactionType.CHARGE, bar, LocalDateTime.now());
+        Transaction recharge = new Transaction(new BigDecimal("10.00"), TransactionType.RECHARGE, konbini, LocalDateTime.now());
+        Transaction charge = new Transaction(new BigDecimal("5.00"), TransactionType.CHARGE, bar, LocalDateTime.now());
 
         try {
             card.rechargeCard(recharge);
@@ -57,7 +57,7 @@ public class TransactionTest {
     void testChargeRejectedByInsufficientBalance() {
         PoppoCard card = new PoppoCard();
         Location bar = new Location("Serena", LocationType.BAR);
-        Transaction charge = new Transaction(BigDecimal.valueOf(5.0), TransactionType.CHARGE, bar, LocalDateTime.now());
+        Transaction charge = new Transaction(new BigDecimal("5.00"), TransactionType.CHARGE, bar, LocalDateTime.now());
 
         Assertions.assertThrows(InsufficientBalanceException.class, () -> {
             card.chargeCard(charge);
@@ -69,7 +69,7 @@ public class TransactionTest {
     void testRechargeOperationNotAllowed() {
         PoppoCard card = new PoppoCard();
         Location bar = new Location("Serena", LocationType.BAR);
-        Transaction recharge = new Transaction(BigDecimal.valueOf(10.0), TransactionType.RECHARGE, bar, LocalDateTime.now());
+        Transaction recharge = new Transaction(new BigDecimal("10.00"), TransactionType.RECHARGE, bar, LocalDateTime.now());
 
         Assertions.assertThrows(OperationNotAllowedException.class, () -> {
             card.rechargeCard(recharge);
@@ -81,8 +81,8 @@ public class TransactionTest {
     void testChargeOperationNotAllowed() {
         PoppoCard card = new PoppoCard();
         Location atm = new Location("ATM", LocationType.VENDING_MACHINE);
-        Transaction charge = new Transaction(BigDecimal.valueOf(5.0), TransactionType.CHARGE, atm, LocalDateTime.now());
-        Transaction recharge = new Transaction(BigDecimal.valueOf(10.0), TransactionType.RECHARGE, atm, LocalDateTime.now());
+        Transaction charge = new Transaction(new BigDecimal("5.00"), TransactionType.CHARGE, atm, LocalDateTime.now());
+        Transaction recharge = new Transaction(new BigDecimal("10.00"), TransactionType.RECHARGE, atm, LocalDateTime.now());
 
         try {
             card.rechargeCard(recharge);
@@ -122,7 +122,7 @@ public class TransactionTest {
     void testUnsupportedOperation() {
         PoppoCard card = new PoppoCard();
         Location atm = new Location("ATM", LocationType.VENDING_MACHINE);
-        Transaction recharge = new Transaction(BigDecimal.valueOf(10.0), TransactionType.RECHARGE, atm, LocalDateTime.now());
+        Transaction recharge = new Transaction(new BigDecimal("10.00"), TransactionType.RECHARGE, atm, LocalDateTime.now());
 
         try {
             card.rechargeCard(recharge);
@@ -140,11 +140,11 @@ public class TransactionTest {
         PoppoCard card = new PoppoCard();
         Location konbini = new Location("Poppo", LocationType.KONBINI);
         Location subway = new Location("JR", LocationType.SUBWAY);
-        Transaction konbiniRecharge = new Transaction(BigDecimal.valueOf(100.0), TransactionType.RECHARGE, konbini, LocalDateTime.now());
-        Transaction konbiniCharge = new Transaction(BigDecimal.valueOf(20.0), TransactionType.CHARGE, konbini, LocalDateTime.now());
-        Transaction konbiniCharge2 = new Transaction(BigDecimal.valueOf(50.0), TransactionType.CHARGE, konbini, LocalDateTime.now());
-        Transaction subwayRecharge = new Transaction(BigDecimal.valueOf(100.0), TransactionType.RECHARGE, subway, LocalDateTime.now());
-        Transaction subwayCharge = new Transaction(BigDecimal.valueOf(10.0), TransactionType.CHARGE, subway, LocalDateTime.now());
+        Transaction konbiniRecharge = new Transaction(new BigDecimal("100.00"), TransactionType.RECHARGE, konbini, LocalDateTime.now());
+        Transaction konbiniCharge = new Transaction(new BigDecimal("20.00"), TransactionType.CHARGE, konbini, LocalDateTime.now());
+        Transaction konbiniCharge2 = new Transaction(new BigDecimal("50.00"), TransactionType.CHARGE, konbini, LocalDateTime.now());
+        Transaction subwayRecharge = new Transaction(new BigDecimal("100.00"), TransactionType.RECHARGE, subway, LocalDateTime.now());
+        Transaction subwayCharge = new Transaction(new BigDecimal("10.00"), TransactionType.CHARGE, subway, LocalDateTime.now());
 
         try {
             card.rechargeCard(subwayRecharge);
@@ -189,9 +189,9 @@ public class TransactionTest {
     void testTransactionHistoryOrder(){
         PoppoCard card = new PoppoCard();
         Location konbini = new Location("Poppo Store", LocationType.KONBINI);
-        Transaction konbiniRecharge = new Transaction(BigDecimal.valueOf(100.0), TransactionType.RECHARGE, konbini, LocalDateTime.now());
-        Transaction konbiniCharge = new Transaction(BigDecimal.valueOf(20.0), TransactionType.CHARGE, konbini, LocalDateTime.now());
-        Transaction konbiniCharge2 = new Transaction(BigDecimal.valueOf(50.0), TransactionType.CHARGE, konbini, LocalDateTime.now());
+        Transaction konbiniRecharge = new Transaction(new BigDecimal("100.00"), TransactionType.RECHARGE, konbini, LocalDateTime.now());
+        Transaction konbiniCharge = new Transaction(new BigDecimal("20.00"), TransactionType.CHARGE, konbini, LocalDateTime.now());
+        Transaction konbiniCharge2 = new Transaction(new BigDecimal("50.00"), TransactionType.CHARGE, konbini, LocalDateTime.now());
 
         try {
             card.rechargeCard(konbiniRecharge);
