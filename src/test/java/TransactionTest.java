@@ -13,6 +13,28 @@ import java.util.List;
 public class TransactionTest {
 
     @Test
+    void testNullLocationName(){
+
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            new Location(null, LocationType.KONBINI);
+        });
+
+    }
+
+    @Test
+    void testNullAmountOnCharge()   {
+
+        PoppoCard card = new PoppoCard();
+
+
+        NullPointerException e = Assertions.assertThrows(NullPointerException.class, () -> {
+            card.chargeCard(null, new Location("Serena", LocationType.BAR));
+        });
+        Assertions.assertEquals("amount cannot be null", e.getMessage());
+
+    }
+
+    @Test
     void testRechargeTransactionSuccess() throws PoppoCardTransactionException {
 
         PoppoCard card = new PoppoCard();
@@ -83,6 +105,7 @@ public class TransactionTest {
 
         PoppoCard card = new PoppoCard();
         Location bar = new Location("Serena", LocationType.BAR);
+
 
         Assertions.assertThrows(InvalidValueException.class, () -> {
             card.chargeCard(new BigDecimal("0.00"), bar);

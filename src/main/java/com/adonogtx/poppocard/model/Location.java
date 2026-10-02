@@ -7,8 +7,8 @@ public class Location {
     LocationType type;
 
     public Location(String name, LocationType type) {
-        this.name = name;
-        this.type = type;
+        this.name = Objects.requireNonNull(name, "name cannot be null");
+        this.type = Objects.requireNonNull(type, "type cannot be null");
     }
 
     @Override
