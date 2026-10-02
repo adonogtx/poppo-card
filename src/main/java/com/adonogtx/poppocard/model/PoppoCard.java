@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class PoppoCard {
 
@@ -22,6 +23,9 @@ public class PoppoCard {
 
     public Transaction rechargeCard(BigDecimal amount, Location location)
             throws PoppoCardTransactionException {
+
+        Objects.requireNonNull(amount, "amount cannot be null");
+        Objects.requireNonNull(location, "location cannot be null");
 
         if (!location.getType().isAcceptsRecharge()) {
             throw new OperationNotAllowedException(String.format(
@@ -48,6 +52,9 @@ public class PoppoCard {
 
     public Transaction chargeCard(BigDecimal amount, Location location)
             throws PoppoCardTransactionException {
+
+        Objects.requireNonNull(amount, "amount cannot be null");
+        Objects.requireNonNull(location, "location cannot be null");
 
         if (!location.getType().isAcceptsCharge()) {
             throw new OperationNotAllowedException(String.format(
